@@ -1,0 +1,139 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "setuptools_scm[toml]>=8.0"]
+
+[project]
+name = "torch_pca"
+authors = [{ name = "Valentin Goldite", email = "valentin.goldite@gmail.com" }]
+description = """PyTorch implementation of PCA (similar to sklearn PCA)."""
+requires-python = ">=3.8"
+keywords = ["principal component analysis", "PCA", "pytorch", "torch"]
+classifiers = ["Programming Language :: Python :: 3"]
+dynamic = ["readme", "dependencies", "version"]
+
+[tool.setuptools]
+license-files = ['LICEN[CS]E*', 'COPYING*', 'NOTICE*', 'AUTHORS*']
+
+[tool.setuptools_scm]
+write_to = "src/torch_pca/_version.py"
+
+[project.urls]
+Source = "https://github.com/valentingol/torch_pca"
+
+[tool.setuptools.dynamic]
+readme = { file = ["README.md"], content-type = "text/markdown" }
+dependencies = { file = ["requirements.txt"] }
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["src/torch_pca/_version.py"]
+
+[tool.coverage.report]
+exclude_lines = ["if __name__ == '__main__':", "    main()"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+log_level = "DEBUG"
+addopts = "--ignore=src/torch_opt/_version.py"
+
+[tool.ruff]
+# pycodestyle error (E) and warning (W), pyflakes (F), mccabe (C90), isort (I),
+# pydocstyle (D), numpy-related (NPY), pandas-related (PD),
+# flake8:
+# annotations (ANN), boolean-trap (FBT), builtins (A), commas (COM),
+# comprehensions (C4), import conventions (ICN), pie (PIE), pytest-style (PT),
+# return (RET), simplify (SIM), tidy-imports (TID), unused-arguments (ARG)
+select = [
+    'A',
+    'ARG',
+    'C4',
+    'C90',
+    'COM',
+    'D',
+    'E',
+    'F',
+    'FBT',
+    'I',
+    'ICN',
+    'NPY',
+    'PD',
+    'PIE',
+    'PT',
+    'RET',
+    'SIM',
+    'TID',
+    'W',
+]
+ignore = ['RET504', 'COM812', 'F841', 'F401']
+fixable = [
+    'A',
+    'ARG',
+    'BLE',
+    'C4',
+    'C90',
+    'COM',
+    'D',
+    'E',
+    'F',
+    'FBT',
+    'I',
+    'ICN',
+    'NPY',
+    'PD',
+    'PIE',
+    'PT',
+    'RET',
+    'SIM',
+    'TID',
+    'W',
+]
+exclude = [
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pypackages__",
+]
+
+line-length = 88
+target-version = "py38"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.isort]
+known-first-party = ["torch_pca"]
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = 'E203'
+
+[tool.pycodestyle]
+ignore = 'E203'
+
+[tool.black]
+line-length = 88
+
+[tool.ruff.pydocstyle]
+convention = 'numpy'
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = false
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+files = '*.py'
+follow_imports = 'skip'
+follow_imports_for_stubs = false
+ignore_missing_imports = true
+no_implicit_optional = true
+no_implicit_reexport = true
+pretty = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unused_ignores = true

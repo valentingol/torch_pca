@@ -1,0 +1,26 @@
+name: Pydocstyle
+
+on: [push]
+
+jobs:
+  pydoc-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install pydocstyle
+          pip install -e .
+      - name: Analysing the code with pydocstyle
+        run: |
+          pydocstyle --convention=numpy . | tee pydocstyle.txt
+      - name: Check the number of errors
+        run: |
+          n_errors=$(wc -l < pydocstyle.txt)
+          echo "Number of errors in docstrings: $n_errors"
+          python github_actions_utils/pydocstyle_manager.py --n_errors=$n_errors

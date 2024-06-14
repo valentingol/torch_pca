@@ -1,0 +1,12 @@
+black==23.3.0
+flake8==6.0.0
+mypy==1.1.1
+mypy-extensions==1.0.0
+pylint==2.17.2
+pylint-django==2.5.3
+pytest==7.3.0
+pytest-check==2.1.4
+pytest-cov==4.0.0
+pytest-mock==3.10.0
+setuptools-scm==8.0.4
+ruff==0.0.261

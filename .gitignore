@@ -1,0 +1,24 @@
+# Cache
+**_cache
+**.pyc
+*/__pycache__
+# Env
+.env
+.venv
+env
+env.yaml
+environment.yml
+venv
+**.egg-info
+# VScode
+.vscode
+# Temporary files
+**/tmp.py
+**/tmp.ipynb
+# Tests
+.coverage
+# SCM
+src/torch_pca/_version.py
+# Doc
+build
+docs/_build
