@@ -25,12 +25,12 @@ except:  # noqa E722
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "myst_parser",
+    # "sphinx.ext.myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.inheritance_diagram",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
-    "sphinx_autodoc_typehints",
+    # "sphinx.ext.sphinx_autodoc_typehints",
 ]
 
 master_doc = "index"
@@ -57,7 +57,7 @@ exclude_patterns = ["_build"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+# html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 html_theme_options = {
