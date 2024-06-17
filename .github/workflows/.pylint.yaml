@@ -1,0 +1,52 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  pylint-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Cache installation
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install pylint pylint-django
+          pip install -e .
+      - name: Analysing the code with pylint
+        run: |
+          pylint --rcfile=.pylintrc --output-format=text $(git ls-files '*.py') | tee .pylint.txt
+      - name: Handle pylint results
+        run: |
+          score=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' .pylint.txt)
+          echo "Pylint score was $score"
+          color=$(python3 -m github_actions_utils.pylint_manager --score=$score)
+          echo "PYLINT_COLOR=$color"
+          echo "PYLINT_COLOR=$color" >> $GITHUB_ENV
+          echo "PYLINT_SCORE=$score/10.00"
+          echo "PYLINT_SCORE=$score/10.00" >> $GITHUB_ENV
+      - name: Create Pylint Badge
+        uses: schneegans/dynamic-badges-action@v1.1.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 8fb4f3f78584e085dd7b0cca7e046d1f
+          filename: torch_pca_pylint.json
+          label: Pylint
+          message: ${{ env.PYLINT_SCORE }}
+          color: ${{ env.PYLINT_COLOR }}
+          style: flat
+          namedLogo: stylelint
+          logoColor: "#959DA5"
+          labelColor: "#343B42"
