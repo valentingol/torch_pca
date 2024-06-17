@@ -37,7 +37,7 @@ Documentation: https://torch-pca.readthedocs.io/en/latest/
 Simply install it with pip:
 
 ```bash
-pip install torch-cpa
+pip install torch-pca
 ```
 
 ## How to use
@@ -56,6 +56,8 @@ pca_model = PCA(n_components=None, svd_solver='full')
 >>> print(pca.explained_variance_ratio_)
 [0.756, 0.142, 0.062, ...]
 ```
+
+More details in the [API documentation](https://torch-pca.readthedocs.io/en/latest/api.html#torch_pca.pca_main.PCA).
 
 ## Implemented features
 
