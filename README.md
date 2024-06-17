@@ -1,4 +1,4 @@
-# Pytorch CPA
+# Pytorch PCA
 
 Principal Component Anlaysis (PCA) in PyTorch. The intention is to provide a
 simple and easy to use implementation of PCA in PyTorch, the most similar to
@@ -26,6 +26,8 @@ pip install torch-cpa
 
 ## How to use
 
+Exactly like `sklearn.decomposition.PCA` but it uses PyTorch tensors as input and output!
+
 ```python
 from torch_cpa import PCA
 
@@ -38,3 +40,30 @@ pca_model = PCA(n_components=None, whiten=False)
 >>> print(pca.explained_variance_ratio_)
 [0.756, 0.142, 0.062, ...]
 ```
+
+## Implemented features
+
+- [x] `fit`, `transform`, `fit_transform`, methods.
+- [x] All attributes from sklean's PCA are available: `explained_variance_(ratio_)`,
+      `singular_values_`, `components_`, `mean_`, `noise_variance_`, ...
+- [x] Full SVD solver
+- [x] SVD by covariance matrix solver
+- [x] (absent from sklearn) Decide how to center the input data in `transform` method
+  (default is like sklearn's PCA)
+
+## To be implemented
+
+- [ ] Find number of components with explaned variance proportion
+- [ ] Randomized SVD solver
+- [ ] ARPACK solver
+- [ ] Find number of components with MLE
+- [ ] `inverse_transform` method
+- [ ] `get_covariance` method
+- [ ] `get_precision` method
+- [ ] Support sparse matrices
+
+## Contributing
+
+Feel free to contribute to this project! Just fork it and make an issue or a pull request.
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
