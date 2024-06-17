@@ -1,0 +1,55 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Cache installation
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install pytest pytest-cov
+          pip install -e .
+      - name: Test with pytest
+        run: |
+          pytest --disable-pytest-warnings --cov-report=term --cov=src --cov-config=.coveragerc tests/ | tee .pytest.txt
+      - name: Handle test results
+        run: |
+          score=$(cat .pytest.txt | grep TOTAL | tr -s ' ' | cut -d ' ' -f 4)
+          n_failures=$(cat .pytest.txt | grep failed | cut -d ' ' -f 2)
+          echo "Pytest finds $n_failures failure(s)"
+          echo "Tests coverage is $score"
+          color=$(python3 -m github_actions_utils.pytest_manager --score=$score --n_failures=$n_failures)
+          echo "PYTEST_COLOR=$color"
+          echo "PYTEST_COLOR=$color" >> $GITHUB_ENV
+          echo "PYTEST_SCORE=$score"
+          echo "PYTEST_SCORE=$score" >> $GITHUB_ENV
+      - name: Create Coverage Badge
+        uses: schneegans/dynamic-badges-action@v1.1.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: c5a6b5731db93da673f8e258b2669080
+          filename: torch_pca_tests.json
+          label: Coverage
+          message: ${{ env.PYTEST_SCORE }}
+          color: ${{ env.PYTEST_COLOR }}
+          style: flat
+          namedLogo: codecov
+          logoColor: "#959DA5"
+          labelColor: "#343B42"
