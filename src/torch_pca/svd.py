@@ -1,13 +1,30 @@
 """Functions related to SVD."""
 
 # Copyright (c) 2024 Valentin Goldité. All Rights Reserved.
-from typing import Tuple
+from typing import Optional, Tuple, Union
 
 import torch
 from torch import Tensor
 
+NComponentsType = Union[int, float, None, str]
 
-def svd_flip(u_mat: Tensor, vh_mat: Tensor) -> Tuple[Tensor, Tensor]:
+
+def choose_svd_solver(inputs: Tensor, n_components: NComponentsType) -> str:
+    """Choose the SVD solver based on the input shape."""
+    if inputs.shape[-1] <= 1_000 and inputs.shape[-2] >= 10 * inputs.shape[-1]:
+        return "covariance_eigh"
+    if max(inputs.shape[-2:]) <= 500 or n_components == "mle":
+        return "full"
+    # NOTE: The randomized solver is not implemented yet.
+    # if (
+    #     isinstance(n_components, float)
+    #     and 1 <= n_components < 0.8 * min(inputs.shape)
+    # ):
+    #     return "randomized"
+    return "full"
+
+
+def svd_flip(u_mat: Optional[Tensor], vh_mat: Tensor) -> Tuple[Tensor, Tensor]:
     """Sign correction to ensure deterministic output from SVD.
 
     Adjusts the columns of u and the rows of v such that
