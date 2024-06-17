@@ -19,18 +19,21 @@ class PCA:
     ----------
     n_components: int | float | str | None, optional
         Number of components to keep.
-        - If int, number of components to keep.
-        - If float (should be between 0.0 and 1.0), the number of components
+
+        * If int, number of components to keep.
+        * If float (should be between 0.0 and 1.0), the number of components
           to keep is determined by the cumulative percentage of variance
           explained by the components until the proportion is reached.
-        - If "mle", the number of components is selected using Minka's MLE.
-        - If None, all components are kept: n_components = min(n_samples, n_features).
+        * If "mle", the number of components is selected using Minka's MLE.
+        * If None, all components are kept: n_components = min(n_samples, n_features).
         By default, n_components=None.
+
     svd_solver: str, optional
         One of {'auto', 'full', 'covariance_eigh'}
-        - 'auto': the solver is selected automatically based on the shape of the input.
-        - 'full': Run exact full SVD with torch.linalg.svd
-        - 'covariance_eigh': Compute the covariance matrix and take
+
+        * 'auto': the solver is selected automatically based on the shape of the input.
+        * 'full': Run exact full SVD with torch.linalg.svd
+        * 'covariance_eigh': Compute the covariance matrix and take
           the eigenvalues decomposition with torch.linalg.eigh.
           Most efficient for small n_features and large n_samples.
         By default, svd_solver='auto'.
@@ -41,16 +44,27 @@ class PCA:
         n_components: NComponentsType = None,
         svd_solver: str = "auto",
     ):
-        self.svd_solver_ = svd_solver
-        self.mean_: Optional[Tensor] = None
-        self.n_components_ = n_components
         self.components_: Optional[Tensor] = None
+        """Principal axes in feature space."""
         self.explained_variance_: Optional[Tensor] = None
+        """The amount of variance explained by each of the selected components."""
         self.explained_variance_ratio_: Optional[Tensor] = None
-        self.singular_values_: Optional[Tensor] = None
-        self.n_samples_: int = -1
-        self.noise_variance_: Optional[Tensor] = None
+        """Percentage of variance explained by each of the selected components."""
+        self.mean_: Optional[Tensor] = None
+        """Mean of the input data during fit."""
+        self.n_components_ = n_components
+        """Number of components to keep."""
         self.n_features_in_: int = -1
+        """Number of features in the input data."""
+        self.n_samples_: int = -1
+        """Number of samples seen during fit."""
+        self.noise_variance_: Optional[Tensor] = None
+        """The estimated noise covariance."""
+        self.singular_values_: Optional[Tensor] = None
+        """The singular values corresponding to each of the selected components."""
+        self.svd_solver_ = svd_solver
+        """Solver to use for the PCA computation."""
+
         if self.svd_solver_ not in ["auto", "full", "covariance_eigh"]:
             raise ValueError(
                 "Unknown SVD solver. `svd_solver` should be one of "
