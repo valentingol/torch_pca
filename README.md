@@ -1,4 +1,4 @@
-# Pytorch PCA
+# Pytorch Principal Component Analysis (PCA)
 
 Principal Component Anlaysis (PCA) in PyTorch. The intention is to provide a
 simple and easy to use implementation of PCA in PyTorch, the most similar to
@@ -26,11 +26,15 @@ the `sklearn`'s PCA as possible (in terms of API and, of course, output).
 
 ## Links
 
+Github repository: https://github.com/valentingol/torch_pca
+
 Pypi project: https://pypi.org/project/torch_pca/
 
 Documentation: https://torch-pca.readthedocs.io/en/latest/
 
 ## Installation
+
+Simply install it with pip:
 
 ```bash
 pip install torch-cpa
