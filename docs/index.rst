@@ -61,5 +61,5 @@ Documentation: https://torch-pca.readthedocs.io/en/latest/
    installation
    howto
    api
-   contributing
-   license
+   contributing.md
+   license.md

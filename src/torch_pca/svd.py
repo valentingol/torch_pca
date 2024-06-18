@@ -1,12 +1,12 @@
 """Functions related to SVD."""
 
 # Copyright (c) 2024 Valentin Goldité. All Rights Reserved.
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import torch
 from torch import Tensor
 
-NComponentsType = Union[int, float, None, str]
+from torch_pca.ncompo import NComponentsType
 
 
 def choose_svd_solver(inputs: Tensor, n_components: NComponentsType) -> str:

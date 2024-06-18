@@ -16,7 +16,6 @@ the `sklearn`'s PCA as possible (in terms of API and, of course, output).
 
 [![Ruff](https://github.com/valentingol/torch_pca/actions/workflows/ruff.yaml/badge.svg)](https://github.com/valentingol/Dinosor/actions/workflows/ruff.yaml)
 [![Flake8](https://github.com/valentingol/torch_pca/actions/workflows/flake.yaml/badge.svg)](https://github.com/valentingol/Dinosor/actions/workflows/flake.yaml)
-[![Pydocstyle](https://github.com/valentingol/torch_pca/actions/workflows/pydocstyle.yaml/badge.svg)](https://github.com/valentingol/Dinosor/actions/workflows/pydocstyle.yaml)
 [![MyPy](https://github.com/valentingol/torch_pca/actions/workflows/mypy.yaml/badge.svg)](https://github.com/valentingol/Dinosor/actions/workflows/mypy.yaml)
 [![PyLint](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/8fb4f3f78584e085dd7b0cca7e046d1f/raw/torch_pca_pylint.json)](https://github.com/valentingol/torch_pca/actions/workflows/pylint.yaml)
 
@@ -57,27 +56,28 @@ pca_model = PCA(n_components=None, svd_solver='full')
 [0.756, 0.142, 0.062, ...]
 ```
 
-More details in the [API documentation](https://torch-pca.readthedocs.io/en/latest/api.html#torch_pca.pca_main.PCA).
+More details and features in the [API documentation](https://torch-pca.readthedocs.io/en/latest/api.html#torch_pca.pca_main.PCA).
 
 ## Implemented features
 
-- [x] `fit`, `transform`, `fit_transform`, methods.
+- [x] `fit`, `transform`, `fit_transform` methods.
 - [x] All attributes from sklean's PCA are available: `explained_variance_(ratio_)`,
       `singular_values_`, `components_`, `mean_`, `noise_variance_`, ...
 - [x] Full SVD solver
 - [x] SVD by covariance matrix solver
 - [x] (absent from sklearn) Decide how to center the input data in `transform` method
   (default is like sklearn's PCA)
+- [x] Find number of components with explained variance proportion
+- [x] Automatically find number of components with MLE
+- [x] `inverse_transform` method
 
 ## To be implemented
 
-- [ ] Find number of components with explaned variance proportion
+- [ ] Whitening option
 - [ ] Randomized SVD solver
 - [ ] ARPACK solver
-- [ ] Find number of components with MLE
-- [ ] `inverse_transform` method
 - [ ] `get_covariance` method
-- [ ] `get_precision` method
+- [ ] `get_precision` method and `score` method
 - [ ] Support sparse matrices
 
 ## Contributing

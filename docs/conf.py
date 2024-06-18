@@ -25,12 +25,12 @@ except:  # noqa E722
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "sphinx.ext.myst_parser",
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.inheritance_diagram",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
-    "sphinx.ext.sphinx_autodoc_typehints",
+    "sphinx_autodoc_typehints",
 ]
 
 master_doc = "index"

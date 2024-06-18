@@ -6,7 +6,8 @@ from typing import Optional
 import torch
 from torch import Tensor
 
-from torch_pca.svd import NComponentsType, choose_svd_solver, svd_flip
+from torch_pca.ncompo import NComponentsType, find_ncomponents
+from torch_pca.svd import choose_svd_solver, svd_flip
 
 
 class PCA:
@@ -26,6 +27,7 @@ class PCA:
           explained by the components until the proportion is reached.
         * If "mle", the number of components is selected using Minka's MLE.
         * If None, all components are kept: n_components = min(n_samples, n_features).
+
         By default, n_components=None.
 
     svd_solver: str, optional
@@ -36,6 +38,7 @@ class PCA:
         * 'covariance_eigh': Compute the covariance matrix and take
           the eigenvalues decomposition with torch.linalg.eigh.
           Most efficient for small n_features and large n_samples.
+
         By default, svd_solver='auto'.
     """
 
@@ -44,26 +47,26 @@ class PCA:
         n_components: NComponentsType = None,
         svd_solver: str = "auto",
     ):
+        #: Principal axes in feature space.
         self.components_: Optional[Tensor] = None
-        """Principal axes in feature space."""
+        #: The amount of variance explained by each of the selected components.
         self.explained_variance_: Optional[Tensor] = None
-        """The amount of variance explained by each of the selected components."""
+        #: Percentage of variance explained by each of the selected components.
         self.explained_variance_ratio_: Optional[Tensor] = None
-        """Percentage of variance explained by each of the selected components."""
+        #: Mean of the input data during fit.
         self.mean_: Optional[Tensor] = None
-        """Mean of the input data during fit."""
-        self.n_components_ = n_components
-        """Number of components to keep."""
+        #: Number of components to keep.
+        self.n_components_: NComponentsType = n_components
+        #: Number of features in the input data.
         self.n_features_in_: int = -1
-        """Number of features in the input data."""
+        #: Number of samples seen during fit.
         self.n_samples_: int = -1
-        """Number of samples seen during fit."""
+        #: The estimated noise covariance.
         self.noise_variance_: Optional[Tensor] = None
-        """The estimated noise covariance."""
+        #: Singular values corresponding to each of the selected components.
         self.singular_values_: Optional[Tensor] = None
-        """The singular values corresponding to each of the selected components."""
-        self.svd_solver_ = svd_solver
-        """Solver to use for the PCA computation."""
+        #: Solver to use for the PCA computation.
+        self.svd_solver_: str = svd_solver
 
         if self.svd_solver_ not in ["auto", "full", "covariance_eigh"]:
             raise ValueError(
@@ -97,7 +100,10 @@ class PCA:
             Input data of shape (n_samples, n_features).
         """
         if self.svd_solver_ == "auto":
-            self.svd_solver_ = choose_svd_solver(inputs, self.n_components_)
+            self.svd_solver_ = choose_svd_solver(
+                inputs=inputs,
+                n_components=self.n_components_,
+            )
         self.mean_ = inputs.mean(dim=-2, keepdim=True)
         self.n_samples_, self.n_features_in_ = inputs.shape[-2:]
         if self.svd_solver_ == "full":
@@ -106,7 +112,7 @@ class PCA:
                 inputs_centered,
                 full_matrices=False,
             )
-            explained_variance_ = coefs**2 / (inputs.shape[-2] - 1)
+            explained_variance = coefs**2 / (inputs.shape[-2] - 1)
         elif self.svd_solver_ == "covariance_eigh":
             covariance = inputs.T @ inputs
             delta = self.n_samples_ * torch.transpose(self.mean_, -2, -1) * self.mean_
@@ -118,26 +124,29 @@ class PCA:
             # Inverted indices
             idx = range(eigenvals.size(0) - 1, -1, -1)
             idx = torch.LongTensor(idx)
-            explained_variance_ = eigenvals.index_select(0, idx)
+            explained_variance = eigenvals.index_select(0, idx)
             # Compute equivalent variables to full SVD output
             vh_mat = eigenvecs.T.index_select(0, idx)
-            coefs = torch.sqrt(explained_variance_ * (self.n_samples_ - 1))
+            coefs = torch.sqrt(explained_variance * (self.n_samples_ - 1))
             u_mat = None
         _, vh_mat = svd_flip(u_mat, vh_mat)
-        total_var = torch.sum(explained_variance_)
-        explained_variance_ratio_ = explained_variance_ / total_var
-        if self.n_components_ is None:
-            self.n_components_ = min(inputs.shape[-2:])
-        if not isinstance(self.n_components_, int):
-            raise ValueError("`n_components` value not supported.")
+        total_var = torch.sum(explained_variance)
+        explained_variance_ratio = explained_variance / total_var
+        self.n_components_ = find_ncomponents(
+            n_components=self.n_components_,
+            inputs=inputs,
+            n_samples=self.n_samples_,
+            explained_variance=explained_variance,
+            explained_variance_ratio=explained_variance_ratio,
+        )
         self.components_ = vh_mat[: self.n_components_]
-        self.explained_variance_ = explained_variance_[: self.n_components_]
-        self.explained_variance_ratio_ = explained_variance_ratio_[: self.n_components_]
+        self.explained_variance_ = explained_variance[: self.n_components_]
+        self.explained_variance_ratio_ = explained_variance_ratio[: self.n_components_]
         self.singular_values_ = coefs[: self.n_components_]
         # Compute noise covariance using Probabilistic PCA model
         # The sigma2 maximum likelihood (cf. eq. 12.46)
         self.noise_variance_ = (
-            torch.mean(explained_variance_[self.n_components_ :])
+            torch.mean(explained_variance[self.n_components_ :])
             if self.n_components_ < min(inputs.shape[-2:])
             else torch.tensor(0.0)
         )
@@ -153,15 +162,17 @@ class PCA:
         center : str
             One of 'fit', 'input' or 'none'.
             Precise how to center the data.
-            - 'fit': center the data using the mean fitted during `fit` (default).
-            - 'input': center the data using the mean of the input data.
-            - 'none': do not center the data.
+
+            * 'fit': center the data using the mean fitted during `fit` (default).
+            * 'input': center the data using the mean of the input data.
+            * 'none': do not center the data.
+
             By default, 'fit' (as sklearn PCA implementation)
 
         Returns
         -------
         transformed : Tensor
-            Transformed data.
+            Transformed data of shape (n_samples, n_components).
         """
         if self.components_ is None:
             raise ValueError(
@@ -179,3 +190,26 @@ class PCA:
                 "one of 'fit', 'input' or 'none'."
             )
         return transformed
+
+    def inverse_transform(self, inputs: Tensor) -> Tensor:
+        """De-transform transformed data.
+
+        Parameters
+        ----------
+        inputs : Tensor
+            Transformed data of shape (n_samples, n_components).
+
+        Returns
+        -------
+        de_transformed : Tensor
+            De-transformed data of shape (n_samples, n_features)
+            where n_features is the number of features in the input data
+            before applying transform.
+        """
+        if self.components_ is None:
+            raise ValueError(
+                "PCA not fitted when calling inverse_transform. "
+                "Please call `fit` or `fit_transform` first."
+            )
+        de_transformed = inputs @ self.components_ + self.mean_
+        return de_transformed
