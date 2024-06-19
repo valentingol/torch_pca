@@ -3,6 +3,7 @@
 Principal Component Anlaysis (PCA) in PyTorch. The intention is to provide a
 simple and easy to use implementation of PCA in PyTorch, the most similar to
 the `sklearn`'s PCA as possible (in terms of API and, of course, output).
+Plus, this implementation is **fully differentiable and faster** (thanks to GPU parallelization)!
 
 [![Release](https://img.shields.io/github/v/tag/valentingol/torch_pca?label=Pypi&logo=pypi&logoColor=yellow)](https://pypi.org/project/torch_pca/)
 ![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
@@ -58,6 +59,50 @@ pca_model = PCA(n_components=None, svd_solver='full')
 
 More details and features in the [API documentation](https://torch-pca.readthedocs.io/en/latest/api.html#torch_pca.pca_main.PCA).
 
+## Gradient backward pass
+
+Use the pytorch framework allows the automatic differentiation of the PCA!
+
+The PCA transform method is always differentiable so it is always possible to
+compute gradient like that:
+
+```python
+pca = PCA()
+for ep in range(n_epochs):
+    optimizer.zero_grad()
+    out = neural_net(inputs)
+    with torch.no_grad():
+        pca.fit(out)
+    out = pca.transform(out)
+    loss = loss_fn(out, targets)
+    loss.backward()
+```
+
+If you want to compute the gradient over the full PCA model (including the
+fitted `pca.n_components`), you can do it by using the "full" SVD solver
+and removing the part of the `fit` method that enforce the deterministic
+output by passing `determinist=False` in `fit` or `fit_transform` method.
+This part sort the components using the singular values and change their sign
+accordingly so it is not differentiable by nature but may be not necessary if
+you don't care about the determinism of the output:
+
+```python
+pca = PCA(svd_solver="full")
+for ep in range(n_epochs):
+    optimizer.zero_grad()
+    out = neural_net(inputs)
+    out = pca.fit_transform(out, determinist=False)
+    loss = loss_fn(out, targets)
+    loss.backward()
+```
+
+## Comparison of execution time with sklearn's PCA
+
+As we can see below the PyTorch PCA is faster than sklearn's PCA, in all the
+configs tested with the parameter by default (for each PCA model):
+
+![include](docs/_static/comparison.png)
+
 ## Implemented features
 
 - [x] `fit`, `transform`, `fit_transform` methods.
@@ -65,20 +110,19 @@ More details and features in the [API documentation](https://torch-pca.readthedo
       `singular_values_`, `components_`, `mean_`, `noise_variance_`, ...
 - [x] Full SVD solver
 - [x] SVD by covariance matrix solver
+- [x] Randomized SVD solver
 - [x] (absent from sklearn) Decide how to center the input data in `transform` method
   (default is like sklearn's PCA)
 - [x] Find number of components with explained variance proportion
 - [x] Automatically find number of components with MLE
 - [x] `inverse_transform` method
+- [x] Whitening option
+- [x] `get_covariance` method
+- [x] `get_precision` method and `score`/`score_samples` methods
 
 ## To be implemented
 
-- [ ] Whitening option
-- [ ] Randomized SVD solver
-- [ ] ARPACK solver
-- [ ] `get_covariance` method
-- [ ] `get_precision` method and `score` method
-- [ ] Support sparse matrices
+- [ ] Support sparse matrices with ARPACK solver
 
 ## Contributing
 
