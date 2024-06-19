@@ -4,7 +4,8 @@ Pytorch PCA
 Principal Component Anlaysis (PCA) in PyTorch. The intention is to
 provide a simple and easy to use implementation of PCA in PyTorch, the
 most similar to the ``sklearn``\ ’s PCA as possible (in terms of API
-and, of course, output).
+and, of course, output). Plus, this implementation is **fully differentiable and faster**
+(thanks to GPU parallelization)!
 
 |Release| |PythonVersion| |PytorchVersion|
 
@@ -12,7 +13,7 @@ and, of course, output).
 
 |Ruff_logo| |Black_logo|
 
-|Ruff| |Flake8| |Pydocstyle| |MyPy| |PyLint|
+|Ruff| |Flake8| |MyPy| |PyLint|
 
 |Tests| |Coverage| |Documentation Status|
 
@@ -41,8 +42,6 @@ Documentation: https://torch-pca.readthedocs.io/en/latest/
    :target: https://github.com/valentingol/Dinosor/actions/workflows/ruff.yaml
 .. |Flake8| image:: https://github.com/valentingol/torch_pca/actions/workflows/flake.yaml/badge.svg
    :target: https://github.com/valentingol/Dinosor/actions/workflows/flake.yaml
-.. |Pydocstyle| image:: https://github.com/valentingol/torch_pca/actions/workflows/pydocstyle.yaml/badge.svg
-   :target: https://github.com/valentingol/Dinosor/actions/workflows/pydocstyle.yaml
 .. |MyPy| image:: https://github.com/valentingol/torch_pca/actions/workflows/mypy.yaml/badge.svg
    :target: https://github.com/valentingol/Dinosor/actions/workflows/mypy.yaml
 .. |PyLint| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/8fb4f3f78584e085dd7b0cca7e046d1f/raw/torch_pca_pylint.json
@@ -60,6 +59,7 @@ Documentation: https://torch-pca.readthedocs.io/en/latest/
 
    installation
    howto
+   grad
    api
    contributing.md
    license.md
