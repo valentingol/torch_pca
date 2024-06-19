@@ -4,7 +4,8 @@ Pytorch PCA
 Principal Component Anlaysis (PCA) in PyTorch. The intention is to
 provide a simple and easy to use implementation of PCA in PyTorch, the
 most similar to the ``sklearn``\ ’s PCA as possible (in terms of API
-and, of course, output).
+and, of course, output). Plus, this implementation is **fully differentiable and faster**
+(thanks to GPU parallelization)!
 
 |Release| |PythonVersion| |PytorchVersion|
 
@@ -58,6 +59,7 @@ Documentation: https://torch-pca.readthedocs.io/en/latest/
 
    installation
    howto
+   grad
    api
    contributing.md
    license.md
