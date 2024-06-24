@@ -159,6 +159,10 @@ class PCA:
         PCA
             The PCA model fitted on the input data.
         """
+        # Auto-cast to float32 because float16 is not supported
+        if inputs.dtype == torch.float16:
+            inputs = inputs.to(torch.float32)
+
         if self.svd_solver_ == "auto":
             self.svd_solver_ = choose_svd_solver(
                 inputs=inputs,
@@ -184,7 +188,7 @@ class PCA:
             eigenvals[eigenvals < 0.0] = 0.0
             # Inverted indices
             idx = range(eigenvals.size(0) - 1, -1, -1)
-            idx = torch.LongTensor(idx)
+            idx = torch.LongTensor(idx).to(eigenvals.device)
             explained_variance = eigenvals.index_select(0, idx)
             total_var = torch.sum(explained_variance)
             # Compute equivalent variables to full SVD output
@@ -192,6 +196,8 @@ class PCA:
             coefs = torch.sqrt(explained_variance * (self.n_samples_ - 1))
             u_mat = None
         elif self.svd_solver_ == "randomized":
+            if self.n_components_ is None:
+                self.n_components_ = min(inputs.shape[-2:])
             if (
                 not isinstance(self.n_components_, int)
                 or int(self.n_components_) != self.n_components_
@@ -267,11 +273,22 @@ class PCA:
         """
         self._check_fitted("transform")
         assert self.components_ is not None  # for mypy
-        transformed = inputs @ self.components_.T
+        assert self.mean_ is not None  # for mypy
+        components = (
+            self.components_.to(torch.float16)
+            if inputs.dtype == torch.float16
+            else self.components_
+        )
+        mean = (
+            self.mean_.to(torch.float16)
+            if inputs.dtype == torch.float16
+            else self.mean_
+        )
+        transformed = inputs @ components.T
         if center == "fit":
-            transformed -= self.mean_ @ self.components_.T
+            transformed -= mean @ components.T
         elif center == "input":
-            transformed -= inputs.mean(dim=-2, keepdim=True) @ self.components_.T
+            transformed -= inputs.mean(dim=-2, keepdim=True) @ components.T
         elif center != "none":
             raise ValueError(
                 "Unknown centering, `center` argument should be "

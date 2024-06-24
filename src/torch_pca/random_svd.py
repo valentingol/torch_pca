@@ -34,7 +34,9 @@ def randomized_range_finder(
 
     if random_state is not None:
         torch.manual_seed(random_state)
-    proj_mat = torch.randn(inputs.shape[-1], size, device=inputs.device)
+    proj_mat = torch.randn(
+        inputs.shape[-1], size, device=inputs.device, dtype=inputs.dtype
+    )
     if power_iteration_normalizer == "auto":
         power_iteration_normalizer = "none" if n_iter <= 2 else "QR"
     qr_normalizer = torch.linalg.qr
