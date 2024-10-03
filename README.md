@@ -45,7 +45,7 @@ pip install torch-pca
 Exactly like `sklearn.decomposition.PCA` but it uses PyTorch tensors as input and output!
 
 ```python
-from torch_cpa import PCA
+from torch_pca import PCA
 
 # Create like sklearn.decomposition.PCA, e.g.:
 pca_model = PCA(n_components=None, svd_solver='full')
