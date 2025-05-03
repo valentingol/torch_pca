@@ -396,3 +396,24 @@ class PCA:
         self._check_fitted("_n_features_out")
         assert self.components_ is not None  # for mypy
         return self.components_.shape[0]
+
+    def to(self, device: str) -> None:
+        """Sends the tensors of a fitted PCA to the specified device.
+
+        Parameters
+        ----------
+        device : str
+            a valid torch device
+        """
+        if self.components_ is not None:
+            self.components_.to(device)
+        if self.explained_variance_ is not None:
+            self.explained_variance_.to(device)
+        if self.explained_variance_ratio_ is not None:
+            self.explained_variance_ratio_.to(device)
+        if self.mean_ is not None:
+            self.mean_.to(device)
+        if self.noise_variance_ is not None:
+            self.noise_variance_.to(device)
+        if self.singular_values_ is not None:
+            self.singular_values_.to(device)
