@@ -411,7 +411,7 @@ class PCA:
         kwargs : Any
             Keyword arguments to pass to the `.to()` method.
             They can be:
-            device : torch.DeviceLikeType
+            device : DeviceLikeType
                 Device to move the model to.
             dtype : torch.dtype
                 Data type to move the model to.
@@ -437,7 +437,7 @@ class PCA:
         for arg in args:
             if isinstance(arg, torch.dtype):
                 to_args["dtype"] = arg
-            elif isinstance(arg, DeviceLikeType):
+            elif isinstance(arg, (str, torch.device, int)):
                 to_args["device"] = arg
             else:
                 raise ValueError(
