@@ -109,7 +109,7 @@ def svd_flip(u_mat: Optional[Tensor], vh_mat: Tensor) -> Tuple[Tensor, Tensor]:
          Adjusted V^H matrix.
     """
     max_abs_v_rows = torch.argmax(torch.abs(vh_mat), dim=1)
-    shift = torch.arange(vh_mat.shape[0]).to(vh_mat.device)
+    shift = torch.arange(vh_mat.shape[0], device=vh_mat.device)
     indices = max_abs_v_rows + shift * vh_mat.shape[1]
     flat_vh = torch.reshape(vh_mat, (-1,))
     signs = torch.sign(torch.take_along_dim(flat_vh, indices, dim=0))

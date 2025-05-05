@@ -4,10 +4,11 @@
 # Inspired from https://github.com/scikit-learn (BSD-3-Clause License)
 # Copyright (c) Scikit-learn developers. All Rights Reserved.
 from math import log
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import torch
 from torch import Tensor
+from torch._prims_common import DeviceLikeType
 
 from torch_pca.ncompo import NComponentsType, find_ncomponents
 from torch_pca.svd import choose_svd_solver, randomized_svd, svd_flip
@@ -219,7 +220,7 @@ class PCA:
             total_var = torch.sum(inputs_centered**2) / (self.n_samples_ - 1)
 
         if determinist:
-            _, vh_mat = svd_flip(u_mat, vh_mat)
+            _, vh_mat = svd_flip(u_mat, vh_mat)  # pylint: disable=E0601
         explained_variance_ratio = explained_variance / total_var
         self.n_components_ = find_ncomponents(
             n_components=self.n_components_,
@@ -396,3 +397,89 @@ class PCA:
         self._check_fitted("_n_features_out")
         assert self.components_ is not None  # for mypy
         return self.components_.shape[0]
+
+    def to(self, *args: Any, **kwargs: Any) -> None:
+        """Move the model to the specified device/dtype.
+
+        Call the native PyTorch `.to()` method on all tensors, parameters
+        and NN modules to move the model to the specified device and/or dtype.
+
+        Parameters
+        ----------
+        args : Any
+            Positional arguments to pass to the `.to()` method.
+        kwargs : Any
+            Keyword arguments to pass to the `.to()` method.
+            They can be:
+            device : torch.DeviceLikeType
+                Device to move the model to.
+            dtype : torch.dtype
+                Data type to move the model to.
+            non_blocking : bool, optional
+                If True, the operation will be non-blocking.
+                By default, False.
+            copy : bool, optional
+            memory_format : torch.memory_format, optional
+
+        Note
+        ----
+            By default, the parameters dtype and device are the same as
+            the input data dtype and device during the fit.
+            This method is used if want you to change the dtype and/or device
+            of the model after the fit. For instance if you fit the model
+            on GPU and want to make inference on CPU.
+
+        Warning
+        -------
+            Require the model to be fitted first.
+        """
+        to_args = {}
+        for arg in args:
+            if isinstance(arg, torch.dtype):
+                to_args["dtype"] = arg
+            elif isinstance(arg, DeviceLikeType):
+                to_args["device"] = arg
+            else:
+                raise ValueError(
+                    "Unknown argument type in `args`, "
+                    "should be one of `torch.dtype` or `torch.DeviceLikeType`."
+                )
+        to_args.update(kwargs)
+        self._to(**to_args)
+
+    def _to(
+        self,
+        device: Optional[DeviceLikeType] = None,
+        dtype: Optional[torch.dtype] = None,
+        *,
+        non_blocking: bool = False,
+        **kwargs: dict,
+    ) -> None:
+        """Move the model to the specified device/dtype.
+
+        Call the native PyTorch `.to()` method on all tensors, parameters
+        and NN modules to move the model to the specified device and/or dtype.
+        """
+        if self.components_ is None:
+            raise ValueError(
+                "PCA not fitted when calling `.to()`. "
+                "Please call `fit` or `fit_transform` first."
+            )
+        attr_list = list(
+            filter(
+                lambda x: not x.startswith("__"),
+                dir(self),
+            )
+        )
+        for attr_name in attr_list:
+            attr_value = getattr(self, attr_name)
+            if isinstance(
+                attr_value, (torch.Tensor, torch.nn.Parameter, torch.nn.Module)
+            ):
+                setattr(
+                    self,
+                    attr_name,
+                    attr_value.to(
+                        device=device, dtype=dtype, non_blocking=non_blocking, **kwargs
+                    ),
+                )
