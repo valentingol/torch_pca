@@ -12,7 +12,7 @@ and, of course, output).
 
 |Ruff_logo| |Black_logo|
 
-|Ruff| |Flake8| |Pydocstyle| |MyPy| |PyLint|
+|Ruff| |Flake8| |MyPy| |PyLint|
 
 |Tests| |Coverage| |Documentation Status|
 
@@ -41,8 +41,6 @@ Documentation: https://torch-pca.readthedocs.io/en/latest/
    :target: https://github.com/valentingol/Dinosor/actions/workflows/ruff.yaml
 .. |Flake8| image:: https://github.com/valentingol/torch_pca/actions/workflows/flake.yaml/badge.svg
    :target: https://github.com/valentingol/Dinosor/actions/workflows/flake.yaml
-.. |Pydocstyle| image:: https://github.com/valentingol/torch_pca/actions/workflows/pydocstyle.yaml/badge.svg
-   :target: https://github.com/valentingol/Dinosor/actions/workflows/pydocstyle.yaml
 .. |MyPy| image:: https://github.com/valentingol/torch_pca/actions/workflows/mypy.yaml/badge.svg
    :target: https://github.com/valentingol/Dinosor/actions/workflows/mypy.yaml
 .. |PyLint| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/8fb4f3f78584e085dd7b0cca7e046d1f/raw/torch_pca_pylint.json
