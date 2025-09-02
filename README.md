@@ -6,7 +6,7 @@ the `sklearn`'s PCA as possible (in terms of API and, of course, output).
 Plus, this implementation is **fully differentiable and faster** (thanks to GPU parallelization)!
 
 [![Release](https://img.shields.io/github/v/tag/valentingol/torch_pca?label=Pypi&logo=pypi&logoColor=yellow)](https://pypi.org/project/torch_pca/)
-![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
+![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.12-informational)
 ![PytorchVersion](https://img.shields.io/badge/pytorch-1.8%20%7E%201.13%20%7C%202.0+-informational)
 
 [![GitHub User followers](https://img.shields.io/github/followers/valentingol?label=User%20followers&style=social)](https://github.com/valentingol)
