@@ -319,7 +319,11 @@ class PCA:
         """
         self._check_fitted("inverse_transform")
         assert self.components_ is not None  # for mypy
-        de_transformed = inputs @ self.components_ + self.mean_
+        if self.whiten:
+            scaled_components = torch.sqrt(self.explained_variance_) * self.components_
+            de_transformed = inputs @ scaled_components + self.mean_
+        else:
+            de_transformed = inputs @ self.components_ + self.mean_
         return de_transformed
 
     def get_covariance(self) -> Tensor:
